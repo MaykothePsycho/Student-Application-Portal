@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-  
 import Sidebar from "./components/Sidebar";
 import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
@@ -22,7 +21,7 @@ function EditApplication() {
     setStep(step - 1);
   };
 
-  React.useEffect(() => {
+useEffect(() => {
     const bilgiGetir = async () => {
       const id = sessionStorage.getItem("email");
 
@@ -39,7 +38,7 @@ function EditApplication() {
   }
 
   }catch(err){
-      setError("Kullanici bilgileri gosterilemedi.");
+      setError("User information could not be displayed.");
   }
 }
 
