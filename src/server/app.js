@@ -96,11 +96,10 @@ app.post('/signout', (req,res) => {
 
 });
 
-app.post('/change-password', (req, res) => {
-  const { oldPassword, newPassword } = req.body;
-  const email = req.user.email;
+app.post('/change_password', (req, res) => {
+  const { email, password } = req.body;
 
-  const checkPasswordQuery = 'SELECT password FROM users WHERE email = ?';
+  const checkPasswordQuery = 'SELECT password FROM user WHERE email = ?';
 
   connection.query(checkPasswordQuery, [email], (err, result) => {
     if (err) {
@@ -116,36 +115,21 @@ app.post('/change-password', (req, res) => {
 
     const userPassword = result[0].password;
 
-    if (userPassword !== oldPassword) {
+    if (userPassword !== password) {
       res.status(401).send({ error: 'The current password is incorrect.' });
       return;
     }
 
-    const checkNewPasswordQuery = 'SELECT password FROM users WHERE email = ? AND password = ?';
+    const updatePasswordQuery = 'UPDATE user SET password = ? WHERE email = ?';
 
-    connection.query(checkNewPasswordQuery, [email, newPassword], (err, result) => {
+    connection.query(updatePasswordQuery, [password, email], (err, result) => {
       if (err) {
-        console.error('Error at new password check.', err);
+        console.error('Error at password update.', err);
         res.status(500).send({ error: 'Something went wrong' });
         return;
       }
 
-      if (result.length > 0) {
-        res.status(401).send({ error: 'The new password cannot be the same as the old one.' });
-        return;
-      }
-
-      const updatePasswordQuery = 'UPDATE users SET password = ? WHERE email = ?';
-
-      connection.query(updatePasswordQuery, [newPassword, email], (err, result) => {
-        if (err) {
-          console.error('Error at password update.', err);
-          res.status(500).send({ error: 'Something went wrong' });
-          return;
-        }
-
-        res.status(200).send({ message: 'User password has been updated.' });
-      });
+      res.status(200).send({ message: 'User password has been updated.' });
     });
   });
 });
@@ -226,11 +210,11 @@ app.post('/change-password', (req, res) => {
 
 app.post("/editapplication", (req,res) => {
 
-    const email = req.body.id;
+    const user_id = req.body.id;
 
     const query = "SELECT * FROM application WHERE idnumber=?";
 
-    connection.query(query, [email], (err,result) => {
+    connection.query(query, [user_id], (err,result) => {
         if(err){
             console.error("An error occurred while retrieving information from the database.", err);
             res.status(500).send({error: "An error occurred while retrieving information from the database."});
